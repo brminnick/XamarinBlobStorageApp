@@ -39,7 +39,7 @@ namespace XamarinBlobStorageApp
 
             try
             {
-                var photosList = await BlobStorageService.GetPhotos().ConfigureAwait(false);
+                var photosList = await PhotosBlobStorageService.GetPhotos().ConfigureAwait(false);
                 AllPhotosList = new ObservableCollection<PhotoModel>(photosList);
             }
             catch (Exception e)

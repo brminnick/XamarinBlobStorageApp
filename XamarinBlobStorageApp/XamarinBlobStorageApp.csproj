@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Services\Base\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ViewModels\AddPhotoViewModel.cs" />
