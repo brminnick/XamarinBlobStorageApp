@@ -13,24 +13,27 @@ namespace XamarinBlobStorageApp
         #region Constant Fields
         readonly static Lazy<CloudStorageAccount> _cloudStorageAccountHolder = new Lazy<CloudStorageAccount>(() => CloudStorageAccount.Parse(AzureBlobStorageConstants.ConnectionString));
         readonly static Lazy<CloudBlobClient> _blobClientHolder = new Lazy<CloudBlobClient>(_cloudStorageAccountHolder.Value.CreateCloudBlobClient);
-        readonly static Lazy<CloudBlobContainer> _blobContainerHolder = new Lazy<CloudBlobContainer>(() => _blobClientHolder.Value.GetContainerReference(AzureBlobStorageConstants.ContainerName));
         #endregion
 
         #region Properties
-        static CloudBlobContainer BlobContainer => _blobContainerHolder.Value;
+        static CloudBlobClient BlobClient => _blobClientHolder.Value;
         #endregion
 
         #region Methods
-        protected static async Task<CloudBlockBlob> SaveBlockBlob(byte[] blob, string blobTitle)
+        protected static async Task<CloudBlockBlob> SaveBlockBlob(string containerName, byte[] blob, string blobTitle)
         {
-            var blockBlob = BlobContainer.GetBlockBlobReference(blobTitle);
+            var blobContainer = GetBlobContainer(containerName);
+
+            var blockBlob = blobContainer.GetBlockBlobReference(blobTitle);
             await blockBlob.UploadFromByteArrayAsync(blob, 0, blob.Length).ConfigureAwait(false);
 
             return blockBlob;
         }
 
-        protected static async Task<List<T>> GetBlobs<T>(string prefix = "", int? maxresultsPerQuery = null, BlobListingDetails blobListingDetails = BlobListingDetails.None) where T : ICloudBlob
+        protected static async Task<List<T>> GetBlobs<T>(string containerName, string prefix = "", int? maxresultsPerQuery = null, BlobListingDetails blobListingDetails = BlobListingDetails.None) where T : ICloudBlob
         {
+            var blobContainer = GetBlobContainer(containerName);
+
             var blobList = new List<T>();
             BlobContinuationToken continuationToken = null;
 
@@ -38,7 +41,7 @@ namespace XamarinBlobStorageApp
             {
                 do
                 {
-                    var response = await BlobContainer.ListBlobsSegmentedAsync(prefix,
+                    var response = await blobContainer.ListBlobsSegmentedAsync(prefix,
                                                                                true,
                                                                                blobListingDetails,
                                                                                maxresultsPerQuery,
@@ -61,6 +64,8 @@ namespace XamarinBlobStorageApp
 
             return blobList;
         }
+
+        static CloudBlobContainer GetBlobContainer(string containerName) => BlobClient.GetContainerReference(containerName);
         #endregion
     }
 }
