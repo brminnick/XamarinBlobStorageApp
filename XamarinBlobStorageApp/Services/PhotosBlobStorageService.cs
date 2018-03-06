@@ -14,8 +14,8 @@ namespace XamarinBlobStorageApp
         {
             try
             {
-                var photoBlob = await SaveBlockBlob(photo, photoTitle).ConfigureAwait(false);
-                return new PhotoModel { Title = photoTitle, Uri = photoBlob.Uri };
+                var photoBlob = await SaveBlockBlob(AzureBlobStorageConstants.ContainerName, photo, photoTitle).ConfigureAwait(false);
+                return new PhotoModel { Title = photoBlob.Name, Uri = photoBlob.Uri };
             }
             catch (Exception e)
             {
@@ -26,7 +26,7 @@ namespace XamarinBlobStorageApp
 
         public static async Task<List<PhotoModel>> GetPhotos()
         {
-            var blobList = await GetBlobs<CloudBlockBlob>().ConfigureAwait(false);
+            var blobList = await GetBlobs<CloudBlockBlob>(AzureBlobStorageConstants.ContainerName).ConfigureAwait(false);
 
             return blobList.Select(x => new PhotoModel { Title = x.Name, Uri = x.Uri }).ToList();
         }
