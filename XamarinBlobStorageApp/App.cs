@@ -1,15 +1,12 @@
-﻿using Xamarin.Forms;
-using System.Linq;
+﻿using System.Linq;
+
+using Xamarin.Forms;
 
 namespace XamarinBlobStorageApp
 {
     public class App : Application
     {
-        //public App() => MainPage = new BaseNavigationPage(new PhotoListPage());
-        public App()
-        {
-            MainPage = new NavigationPage(new ImagePage());
-        }
+		public App() => MainPage = new NavigationPage(new ImagePage());
     }
 
     public class ImagePage : ContentPage
@@ -17,7 +14,7 @@ namespace XamarinBlobStorageApp
         readonly Label _title = new Label
         {
             HorizontalTextAlignment = TextAlignment.Center,
-            TextColor = ColorConstants.DetailColor
+			TextColor = Color.FromHex("1B2A38")
         };
         readonly Image _image = new Image();
         readonly ActivityIndicator _activityIndicator = new ActivityIndicator();
@@ -49,7 +46,7 @@ namespace XamarinBlobStorageApp
 
             var firstPhoto = photoList?.FirstOrDefault();
 
-            _title.Text = firstPhoto?.Title;
+            _title.Text = firstPhoto?.Title ?? "Photo Not Found";
             _image.Source = ImageSource.FromUri(firstPhoto?.Uri);
 
             _activityIndicator.IsRunning = false;
