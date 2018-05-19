@@ -9,8 +9,6 @@ namespace XamarinBlobStorageApp.iOS
         public override bool FinishedLaunching(UIApplication uiApplication, NSDictionary launchOptions)
 		{
             global::Xamarin.Forms.Forms.Init();
-			FFImageLoading.Forms.Touch.CachedImageRenderer.Init();
-            EntryCustomReturn.Forms.Plugin.iOS.CustomReturnEntryRenderer.Init();
 
             LoadApplication(new App());
 
