@@ -1,56 +1,19 @@
-﻿using System.Linq;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration;
+using Xamarin.Forms.PlatformConfiguration.iOSSpecific;
 
 namespace XamarinBlobStorageApp
 {
-    public class App : Application
+    public class App : Xamarin.Forms.Application
     {
-		public App() => MainPage = new NavigationPage(new ImagePage());
-    }
-
-    public class ImagePage : ContentPage
-    {
-        readonly Label _title = new Label
+        public App()
         {
-            HorizontalTextAlignment = TextAlignment.Center,
-			TextColor = Color.FromHex("1B2A38")
-        };
-        readonly Image _image = new Image();
-        readonly ActivityIndicator _activityIndicator = new ActivityIndicator();
+            Device.SetFlags(new[] { "Markup_Experimental" });
 
-        public ImagePage()
-        {
-            Content = new StackLayout
-            {
-                Spacing = 15,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                Children = {
-                    _title,
-                    _image,
-                    _activityIndicator
-                }
-            };
+            var navigationPage = new Xamarin.Forms.NavigationPage(new ImagePage());
+            navigationPage.On<iOS>().SetPrefersLargeTitles(true);
 
-            Title = "Image Page";
-        }
-
-        protected override async void OnAppearing()
-        {
-            base.OnAppearing();
-
-            _activityIndicator.IsRunning = true;
-
-            var photoList = await PhotosBlobStorageService.GetPhotos();
-
-            var firstPhoto = photoList?.FirstOrDefault();
-
-            _title.Text = firstPhoto?.Title ?? "Photo Not Found";
-            _image.Source = ImageSource.FromUri(firstPhoto?.Uri);
-
-            _activityIndicator.IsRunning = false;
-            _activityIndicator.IsVisible = false;
+            MainPage = navigationPage;
         }
     }
 }

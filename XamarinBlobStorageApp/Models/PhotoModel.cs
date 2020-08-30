@@ -1,8 +1,13 @@
-﻿namespace XamarinBlobStorageApp
+﻿using System;
+
+namespace XamarinBlobStorageApp
 {
     public class PhotoModel
     {
-        public System.Uri Uri { get; set; }
-        public string Title { get; set; }
+        public PhotoModel(Uri uri, string title) =>
+            (Uri, Title) = (uri, title);
+
+        public Uri Uri { get; }
+        public string Title { get; }
     }
 }

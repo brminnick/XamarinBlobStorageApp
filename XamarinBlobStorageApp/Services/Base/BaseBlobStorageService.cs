@@ -5,21 +5,18 @@ using System.Collections.Generic;
 
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace XamarinBlobStorageApp
 {
     public abstract class BaseBlobStorageService
     {
-        #region Constant Fields
         readonly static Lazy<CloudStorageAccount> _cloudStorageAccountHolder = new Lazy<CloudStorageAccount>(() => CloudStorageAccount.Parse(AzureBlobStorageConstants.ConnectionString));
         readonly static Lazy<CloudBlobClient> _blobClientHolder = new Lazy<CloudBlobClient>(_cloudStorageAccountHolder.Value.CreateCloudBlobClient);
-        #endregion
 
-        #region Properties
         static CloudBlobClient BlobClient => _blobClientHolder.Value;
-        #endregion
 
-        #region Methods
         protected static async Task<CloudBlockBlob> SaveBlockBlob(string containerName, byte[] blob, string blobTitle)
         {
             var blobContainer = GetBlobContainer(containerName);
@@ -30,42 +27,24 @@ namespace XamarinBlobStorageApp
             return blockBlob;
         }
 
-        protected static async Task<List<T>> GetBlobs<T>(string containerName, string prefix = "", int? maxresultsPerQuery = null, BlobListingDetails blobListingDetails = BlobListingDetails.None) where T : ICloudBlob
+        protected static async IAsyncEnumerable<T> GetBlobs<T>(string containerName, [EnumeratorCancellation] CancellationToken cancellationToken, string prefix = "", int? maxresultsPerQuery = null, BlobListingDetails blobListingDetails = BlobListingDetails.None) where T : ICloudBlob
         {
             var blobContainer = GetBlobContainer(containerName);
+            BlobContinuationToken? continuationToken = null;
 
-            var blobList = new List<T>();
-            BlobContinuationToken continuationToken = null;
-
-            try
+            do
             {
-                do
+                var response = await blobContainer.ListBlobsSegmentedAsync(prefix, true, blobListingDetails, maxresultsPerQuery, continuationToken, null, null, cancellationToken);
+                continuationToken = response.ContinuationToken;
+
+                foreach (var blob in response.Results.OfType<T>())
                 {
-                    var response = await blobContainer.ListBlobsSegmentedAsync(prefix,
-                                                                               true,
-                                                                               blobListingDetails,
-                                                                               maxresultsPerQuery,
-                                                                               continuationToken,
-                                                                               null,
-                                                                               null).ConfigureAwait(false);
-                    continuationToken = response?.ContinuationToken;
+                    yield return blob;
+                }
 
-                    foreach (var blob in response?.Results?.OfType<T>())
-                    {
-                        blobList.Add(blob);
-                    }
-
-                } while (continuationToken != null);
-            }
-            catch (Exception e)
-            {
-                DebugServices.Log(e);
-            }
-
-            return blobList;
+            } while (continuationToken != null);
         }
 
         static CloudBlobContainer GetBlobContainer(string containerName) => BlobClient.GetContainerReference(containerName);
-        #endregion
     }
 }
