@@ -11,8 +11,8 @@ namespace XamarinBlobStorageApp
 {
     public abstract class BaseBlobStorageService
     {
-        readonly static Lazy<CloudStorageAccount> _cloudStorageAccountHolder = new Lazy<CloudStorageAccount>(() => CloudStorageAccount.Parse(AzureBlobStorageConstants.ConnectionString));
-        readonly static Lazy<CloudBlobClient> _blobClientHolder = new Lazy<CloudBlobClient>(_cloudStorageAccountHolder.Value.CreateCloudBlobClient);
+        readonly static Lazy<CloudStorageAccount> _cloudStorageAccountHolder = new(() => CloudStorageAccount.Parse(AzureBlobStorageConstants.ConnectionString));
+        readonly static Lazy<CloudBlobClient> _blobClientHolder = new(_cloudStorageAccountHolder.Value.CreateCloudBlobClient);
 
         static CloudBlobClient BlobClient => _blobClientHolder.Value;
 

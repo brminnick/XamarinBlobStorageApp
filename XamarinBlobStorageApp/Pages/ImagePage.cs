@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Xamarin.Forms.Markup;
+using Xamarin.CommunityToolkit.Markup;
 
 namespace XamarinBlobStorageApp
 {
     public class ImagePage : ContentPage
     {
-        readonly List<PhotoModel> _photoList = new List<PhotoModel>();
+        readonly List<PhotoModel> _photoList = new();
 
         readonly Label _title;
         readonly Image _image;

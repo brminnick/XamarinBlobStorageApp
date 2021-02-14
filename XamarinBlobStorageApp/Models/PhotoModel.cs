@@ -1,13 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace XamarinBlobStorageApp
 {
-    public class PhotoModel
-    {
-        public PhotoModel(Uri uri, string title) =>
-            (Uri, Title) = (uri, title);
+    public record PhotoModel(Uri Uri, string Title);
+}
 
-        public Uri Uri { get; }
-        public string Title { get; }
-    }
+namespace System.Runtime.CompilerServices
+{
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class IsExternalInit { }
 }
